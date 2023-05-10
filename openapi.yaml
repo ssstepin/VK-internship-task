@@ -1,0 +1,231 @@
+openapi: 3.0.0
+info:
+  title: API Django-сервиса друзей
+  version: 0.0.1
+servers:
+  - url: http://127.0.0.1:8000/api
+    description: Development server
+paths:
+  /register/{username}:
+    post:
+      summary: Создание нового пользователя
+      parameters:
+        - name: username
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '201':
+          description: Успешно добавлен пользователь
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  username:
+                    type: string
+        '409':
+          description: Пользователь с таким именем уже есть
+        '400':
+          description: Что-то пошло не так
+          
+  /friend_request/{user1_id}/{user2_id}:
+    post:
+      summary: Создание нового запроса в друзья
+      parameters:
+        - name: user1_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          
+        - name: user2_id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '201':
+          description: Успешно создан запрос в друзья
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  friend request:
+                    type: object
+                    properties:
+                      user1_id:
+                        type: integer
+                      user2_id:
+                        type: integer
+        '409':
+          description: Такой запрос уже был создан
+          content:
+             application/json:
+              schema:
+                    properties:
+                      message:
+                        type: string
+                        example: This request already exists.
+                        
+        '405':
+          description: Эти пользователи уже друзья
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Already friends.
+        
+        '403':
+          description: user_id одинаковые
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Can't send request to the same user.
+                        
+        '400':
+          description: Что-то пошло не так
+          
+  /requests_incoming_lsit/{user_id}:
+    get:
+      summary: Список всех входящих запросов в друзья
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Список входящих запросов в друзья (может быть пустым)
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  incoming friend requests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user1_id:
+                          type: integer
+                        user2_id:
+                          type: integer
+                          
+  /requests_outgoing_lsit/{user_id}:
+    get:
+      summary: Список всех исходящих запросов в друзья
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Список исходящих запросов в друзья (может быть пустым)
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  outgoing friend requests:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user1_id:
+                          type: integer
+                        user2_id:
+                          type: integer
+                          
+                          
+  /friends_list/{user_id}:
+    get:
+      summary: Список всех друзей
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Список друзей (может быть пустым)
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  user_id friends ids:
+                    type: array
+                    items:
+                      type: integer
+                      
+  /status/{user1_id}/{user2_id}:
+    get:
+      summary: Статус дружбы двух пользователей
+      parameters:
+        - name: user1_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          
+        - name: user2_id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Статус дружбы
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [friends, nothing, incoming friend request, outgoing friend request]
+  
+  /delete/{user1_id}/{user2_id}:
+    delete:
+      summary: Удаление из друзей
+      parameters:
+        - name: user1_id
+          in: path
+          schema:
+            type: integer
+          required: true
+          
+        - name: user2_id
+          in: path
+          schema:
+            type: integer
+          required: true
+      responses:
+        '200':
+          description: Пользователь удален из друзей
+        '400':
+          description: Пользователи не друзья
+          content:
+             application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: not friends
