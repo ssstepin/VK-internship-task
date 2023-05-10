@@ -16,7 +16,7 @@ def register_new_user(request, username):
             return Response(status=status.HTTP_409_CONFLICT)
         else:
             serializer.save()
-            return Response({"new_user": serializer.data}, status=status.HTTP_201_CREATED)
+            return Response({"new user": serializer.data}, status=status.HTTP_201_CREATED)
     else:
         return Response(status=status.HTTP_400_BAD_REQUEST)
 
